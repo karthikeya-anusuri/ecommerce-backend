@@ -13,88 +13,93 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(
-            JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+            throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
 
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS))
+                                SessionCreationPolicy.STATELESS
+                        )
+                )
 
                 .authorizeHttpRequests(auth -> auth
 
                         // Authentication
-                        .requestMatchers("/api/auth/login")
-                        .permitAll()
+                        .requestMatchers("/api/auth/login").permitAll()
+
+                        // Swagger / OpenAPI
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/v3/api-docs/**")
-                        .permitAll()
+                                "/v3/api-docs/**"
+                        ).permitAll()
 
                         // Products
-                        .requestMatchers(
-                                HttpMethod.GET,
-                                "/api/products/**")
+                        .requestMatchers(HttpMethod.GET, "/api/products/**")
                         .hasAnyRole("USER", "ADMIN")
 
                         .requestMatchers(
                                 HttpMethod.POST,
-                                "/api/products/**")
-                        .hasRole("ADMIN")
+                                "/api/products/**"
+                        ).hasRole("ADMIN")
 
                         .requestMatchers(
                                 HttpMethod.PUT,
-                                "/api/products/**")
-                        .hasRole("ADMIN")
+                                "/api/products/**"
+                        ).hasRole("ADMIN")
 
                         .requestMatchers(
                                 HttpMethod.DELETE,
-                                "/api/products/**")
-                        .hasRole("ADMIN")
+                                "/api/products/**"
+                        ).hasRole("ADMIN")
 
                         // Categories
-                        .requestMatchers(
-                                HttpMethod.GET,
-                                "/api/categories/**")
+                        .requestMatchers(HttpMethod.GET, "/api/categories/**")
                         .hasAnyRole("USER", "ADMIN")
 
                         .requestMatchers(
                                 HttpMethod.POST,
-                                "/api/categories/**")
-                        .hasRole("ADMIN")
+                                "/api/categories/**"
+                        ).hasRole("ADMIN")
 
                         .requestMatchers(
                                 HttpMethod.PUT,
-                                "/api/categories/**")
-                        .hasRole("ADMIN")
+                                "/api/categories/**"
+                        ).hasRole("ADMIN")
 
                         .requestMatchers(
                                 HttpMethod.DELETE,
-                                "/api/categories/**")
-                        .hasRole("ADMIN")
+                                "/api/categories/**"
+                        ).hasRole("ADMIN")
 
                         // Users
+                        // POST is temporarily public so we can create
+                        // the first Railway user.
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/users"
+                        ).permitAll()
+
+                        // All other user operations remain ADMIN only.
                         .requestMatchers("/api/users/**")
                         .hasRole("ADMIN")
 
-                        .requestMatchers("/api/orders/admin")
-                        .hasRole("ADMIN")
+                        // Admin order operations
+                        .requestMatchers(
+                                "/api/orders/admin",
+                                "/api/orders/admin/**"
+                        ).hasRole("ADMIN")
 
-                        .requestMatchers("/api/orders/admin/**")
-                        .hasRole("ADMIN")
-
-                        // All other APIs require authentication
-                        .anyRequest()
-                        .authenticated()
+                        // Everything else requires authentication
+                        .anyRequest().authenticated()
                 )
 
                 .addFilterBefore(
