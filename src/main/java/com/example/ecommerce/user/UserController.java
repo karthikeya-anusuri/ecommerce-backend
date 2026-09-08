@@ -26,7 +26,9 @@ public class UserController {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
-        user.setRole("USER");
+
+        // TEMPORARY: create the first Railway admin
+        user.setRole("ADMIN");
 
         User createdUser = userService.createUser(user);
 
