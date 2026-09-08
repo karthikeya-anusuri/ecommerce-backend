@@ -80,18 +80,6 @@ public class SecurityConfig {
                                 "/api/categories/**"
                         ).hasRole("ADMIN")
 
-                        // Users
-                        // POST is temporarily public so we can create
-                        // the first Railway user.
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/api/users"
-                        ).permitAll()
-
-                        // All other user operations remain ADMIN only.
-                        .requestMatchers("/api/users/**")
-                        .hasRole("ADMIN")
-
                         // Admin order operations
                         .requestMatchers(
                                 "/api/orders/admin",
